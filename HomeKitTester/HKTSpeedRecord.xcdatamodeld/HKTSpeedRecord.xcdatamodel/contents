@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="11759" systemVersion="16E192b" minimumToolsVersion="Automatic" sourceLanguage="Objective-C" userDefinedModelVersionIdentifier="">
+    <entity name="Benchmark" representedClassName="Benchmark" syncable="YES" codeGenerationType="class">
+        <attribute name="value" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+    </entity>
+    <entity name="CharacteristicRecord" representedClassName="CharacteristicRecord" syncable="YES" codeGenerationType="class">
+        <attribute name="identifier" attributeType="String" syncable="YES"/>
+        <relationship name="types" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="RecordType" inverseName="charRec" inverseEntity="RecordType" syncable="YES"/>
+    </entity>
+    <entity name="RecordType" representedClassName="RecordType" syncable="YES" codeGenerationType="class">
+        <attribute name="typeName" attributeType="String" syncable="YES"/>
+        <relationship name="charRec" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CharacteristicRecord" inverseName="types" inverseEntity="CharacteristicRecord" syncable="YES"/>
+        <relationship name="instances" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Benchmark" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="CharacteristicRecord" positionX="-63" positionY="-18" width="128" height="75"/>
+        <element name="RecordType" positionX="-54" positionY="0" width="128" height="90"/>
+        <element name="Benchmark" positionX="-36" positionY="9" width="128" height="60"/>
+    </elements>
+</model>
