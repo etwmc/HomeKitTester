@@ -15,7 +15,7 @@ License: You can use it for personal usage as hobbyist. However, for business pu
 #Plug for relative project
 
 Want to turn off the lights when everyone is out? How about closing the gas valve? Introduing a derived project: WiFi-Radar. No apps needed, no GPS tracing. All you need is a Wi-Fi network and a *nix running system
-<a ref="https://github.com/etwmc/WiFi-RadarHAP">"WiFi-Radar-HAP</a>
+[#WiFi-Radar-HAP](https://github.com/etwmc/WiFi-RadarHAP)
 
 Also, the first HomeKit test and benchmark app
-<a ref="http://github.com/etwmc/HomeKitTester">HomeKitTester</a>
+[#HomeKitTester](http://github.com/etwmc/HomeKitTester)
