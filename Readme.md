@@ -4,11 +4,7 @@ HomeKitTester is an iOS App to test and benchmark the behavior of HomeKit Access
 
 It makes use HomeKit Framework on iOS, and currently cover IP based connection. (BLE require changes from testing Bonjour to BLE. However, I'm not working on BLE version of PHK)
 
-<<<<<<< HEAD
 This is not based on the MFi Documentation on HomeKit Test Case (still, I don't have access here, and possibly won't for a long time :P ), but the test case would be based on the knowledge from the PersonalHomeKit project, and can be extend to the MFi standard. 
-=======
-This is not based on the MFi Documentation on HomeKit Test Case (still, don't have access here :P ), but the test case would be based on the knowledge from the PersonalHomeKit project, and can be extend to the MFi standard. 
->>>>>>> e6a6bd3d667d39c0542384d122509f7827352f3a
 
 Technology used: Core Data, HomeKit, iOS SDK, Swift
 
