@@ -22,6 +22,7 @@ enum HKTAccessoryTestProgress: String {
     case child = "Testing bridged child";
     case offReachability = "Turn it off to Test Reachability"
     case onReachability = "Turn it on to Test Reachability"
+    case save = "Saved"
 }
 
 func accessCharacteristic(accessory: HMAccessory, serviceType: String, characteristicType: String)->[HMCharacteristic] {
@@ -267,6 +268,7 @@ class HTKAccessoryTest: NSObject, HMAccessoryDelegate {
                         
                     } else {
                         self.modelAgainst.paired = false
+                        NotificationCenter.default.post(name: HKTAccessoryTestProgressName, object: HKTAccessoryTestProgress.fail)
                     }
                 }
             })

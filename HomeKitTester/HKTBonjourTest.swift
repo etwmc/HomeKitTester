@@ -12,7 +12,7 @@ import HomeKit
 class HKTBonjourSeek: NSObject, NetServiceBrowserDelegate, NetServiceDelegate {
     let browser = NetServiceBrowser()
     let target: String
-    let callback: (HKTBonjourTest)->Void
+    var callback: ((HKTBonjourTest)->Void)?
     init(targetStr: String, foundServiceCallback: @escaping ((HKTBonjourTest)->Void)) {
         target = targetStr
         callback = foundServiceCallback
@@ -29,8 +29,9 @@ class HKTBonjourSeek: NSObject, NetServiceBrowserDelegate, NetServiceDelegate {
         }
     }
     func netServiceDidResolveAddress(_ sender: NetService) {
-        if let service = HKTBonjourTest.init(accBonjour: sender) {
+        if let service = HKTBonjourTest.init(accBonjour: sender), let callback = callback {
             callback(service)
+            self.callback = nil
         } else {
             submitError(errorMsg: "Bonjour TXT Record incorrect->fatal", fatal: true)
         }

@@ -50,6 +50,9 @@ class ViewController: UITableViewController, HMAccessoryBrowserDelegate, HMHomeM
                         self.stateStruct.setHidden(false)
                         self.tableView.isUserInteractionEnabled = false
                         break
+                    case .save:
+                        currentRecorder = nil
+                        break
                     default: break
                     }
                     self.stateStruct.label.text = state.rawValue

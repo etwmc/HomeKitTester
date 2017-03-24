@@ -108,6 +108,8 @@ class HKTRecorderManager: NSObject {
                 
             }
         }
-        msgQueue.sync {}
+        msgQueue.sync {
+            NotificationCenter.default.post(name: HKTAccessoryTestProgressName, object: HKTAccessoryTestProgress.save)
+        }
     }
 }
