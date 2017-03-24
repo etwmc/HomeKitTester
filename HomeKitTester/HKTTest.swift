@@ -11,7 +11,10 @@ import UIKit
 //These should be run on main queue
 var currentRecorder: HKTRecorderManager?
 func setRecorder(recorder: HKTRecorderManager) { currentRecorder = recorder }
-func submitError(errorMsg: String, fatal: Bool = false) { currentRecorder?.submitError(errorMsg: errorMsg) }
+func submitError(errorMsg: String, fatal: Bool = false) {
+    if fatal { NotificationCenter.default.post(name: HKTAccessoryTestProgressName, object: HKTAccessoryTestProgress.fail) }
+    currentRecorder?.submitError(errorMsg: errorMsg)
+}
 func submitSummary(summaryMsg: String) { currentRecorder?.submitSummary(summaryMsg: summaryMsg) }
 func submitBenchmark(objUUID: UUID, type: String, value: Double, recorder: HKTRecorderManager) { recorder.submitBenchmark(objUUID: objUUID, typeStr: type, value: value) }
 func promptManualInteraction(title: String, detail: String) {

@@ -15,6 +15,7 @@ class ViewController: UITableViewController, HMAccessoryBrowserDelegate, HMHomeM
     let manager = HMHomeManager()
     var home: HMHome! = nil
     let accessoryBrowser = HMAccessoryBrowser()
+    var stateStruct: WMCactivityIndicatorOverlay!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,6 +30,33 @@ class ViewController: UITableViewController, HMAccessoryBrowserDelegate, HMHomeM
         // Do any additional setup after loading the view, typically from a nib.
         onlyVC = self
         accessoryBrowser.delegate = self
+        
+        //Doing state check
+        NotificationCenter.default.addObserver(forName: HKTAccessoryTestProgressName, object: nil, queue: nil) { (notification: Notification) in
+            DispatchQueue.main.async {
+                if let state = notification.object as? HKTAccessoryTestProgress {
+                    switch state {
+                    case .fail, .stop:
+                        self.stateStruct.setHidden(true)
+                        self.tableView.isUserInteractionEnabled = true
+                        break
+                    case .start:
+                        self.stateStruct.setHidden(false)
+                        self.tableView.isUserInteractionEnabled = false
+                        break
+                    default: break
+                    }
+                    self.stateStruct.label.text = state.rawValue
+                }
+            }
+        }
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        stateStruct = createActivityIndicatorOverlay(superView: self.view.superview!)
+        stateStruct.setHidden(true)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -54,6 +82,7 @@ class ViewController: UITableViewController, HMAccessoryBrowserDelegate, HMHomeM
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        self.tableView.deselectRow(at: indexPath, animated: true)
         let accessory = accessoryBrowser.discoveredAccessories[indexPath.row]
         //Add the accessory
         let test = HTKAccessoryTest()

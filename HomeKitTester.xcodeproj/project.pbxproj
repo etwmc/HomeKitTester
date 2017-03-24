@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		336E5F541E848439007EA82F /* WMCProgressOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 336E5F531E848439007EA82F /* WMCProgressOverlay.swift */; };
 		337EB37B1E820E5A008E47BA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 337EB37A1E820E5A008E47BA /* AppDelegate.swift */; };
 		337EB37D1E820E5A008E47BA /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 337EB37C1E820E5A008E47BA /* ViewController.swift */; };
 		337EB3801E820E5A008E47BA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 337EB37E1E820E5A008E47BA /* Main.storyboard */; };
@@ -24,6 +25,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		336E5F531E848439007EA82F /* WMCProgressOverlay.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WMCProgressOverlay.swift; sourceTree = "<group>"; };
 		337EB3771E820E5A008E47BA /* HomeKitTester.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HomeKitTester.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		337EB37A1E820E5A008E47BA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		337EB37C1E820E5A008E47BA /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -83,6 +85,7 @@
 				337EB3921E821891008E47BA /* Model */,
 				337EB37A1E820E5A008E47BA /* AppDelegate.swift */,
 				337EB37C1E820E5A008E47BA /* ViewController.swift */,
+				336E5F531E848439007EA82F /* WMCProgressOverlay.swift */,
 				337EB37E1E820E5A008E47BA /* Main.storyboard */,
 				337EB3811E820E5A008E47BA /* Assets.xcassets */,
 				337EB3831E820E5A008E47BA /* LaunchScreen.storyboard */,
@@ -227,6 +230,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				337EB3941E8218C6008E47BA /* HKTAccessoryModel.swift in Sources */,
+				336E5F541E848439007EA82F /* WMCProgressOverlay.swift in Sources */,
 				337EB37D1E820E5A008E47BA /* ViewController.swift in Sources */,
 				33ACC1D31E8263B700355CFE /* HKTSpeedRecord.xcdatamodeld in Sources */,
 				33ACC1ED1E82647C00355CFE /* HKTRecorderManager.swift in Sources */,

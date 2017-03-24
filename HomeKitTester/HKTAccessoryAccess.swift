@@ -8,6 +8,22 @@
 
 import HomeKit
 
+let HKTAccessoryTestProgressName = Notification.Name.init("HKTAccessoryTestProgressStr")
+enum HKTAccessoryTestProgress: String {
+    case start = "Test Starting";
+    case bonjour = "Looking for Bonjour";
+    case pairing = "Pairing";
+    case unpairing = "Unpairing";
+    case ioTesting = "Testing I/O";
+    case identify = "Identifying"
+    case notify = "Test Notify";
+    case stop = "Done";
+    case fail = "Test fail";
+    case child = "Testing bridged child";
+    case offReachability = "Turn it off to Test Reachability"
+    case onReachability = "Turn it on to Test Reachability"
+}
+
 func accessCharacteristic(accessory: HMAccessory, serviceType: String, characteristicType: String)->[HMCharacteristic] {
     let services = accessory.services.filter({ $0.serviceType == serviceType })
     if services.count > 0 {
@@ -178,20 +194,29 @@ class HTKAccessoryTest: NSObject, HMAccessoryDelegate {
     
     var modelAgainst: HKTAccessoryModel!
     
+    var currentHome: HMHome!
+    
     func testAccessory(accessory: HMAccessory, home: HMHome) {
+        currentHome = home
+        
+        NotificationCenter.default.post(name: HKTAccessoryTestProgressName, object: HKTAccessoryTestProgress.start)
+        
         setRecorder(recorder: record)
         //Setup model
         modelAgainst = HKTAccessoryModel(accessory: accessory)
         //Seek IP
+        NotificationCenter.default.post(name: HKTAccessoryTestProgressName, object: HKTAccessoryTestProgress.bonjour)
         bonjour = HKTBonjourSeek(targetStr: accessory.name) { (test: HKTBonjourTest) in
             test.setModel(targetModel: self.modelAgainst)
             
+            NotificationCenter.default.post(name: HKTAccessoryTestProgressName, object: HKTAccessoryTestProgress.identify)
             accessory.identify(completionHandler: { (error: Error?) in
                 if error == nil {
                     submitSummary(summaryMsg: "Identify Success without pairing")
                 } else {
                     submitError(errorMsg: "Identify Fail without pairing")
                 }
+                NotificationCenter.default.post(name: HKTAccessoryTestProgressName, object: HKTAccessoryTestProgress.pairing)
                 home.addAccessory(accessory) { (error: Error?) in
                     if error == nil {
                         
@@ -203,6 +228,7 @@ class HTKAccessoryTest: NSObject, HMAccessoryDelegate {
                             }
                         }
                         
+                        NotificationCenter.default.post(name: HKTAccessoryTestProgressName, object: HKTAccessoryTestProgress.identify)
                         accessory.identify(completionHandler: { (error: Error?) in
                             if error == nil {
                                 submitSummary(summaryMsg: "Identify Success with pairing")
@@ -213,14 +239,17 @@ class HTKAccessoryTest: NSObject, HMAccessoryDelegate {
                         
                         self.modelAgainst.paired = true
                         testQueue.addOperation {
-                            sleep(2)
+                            sleep(1)
+                            NotificationCenter.default.post(name: HKTAccessoryTestProgressName, object: HKTAccessoryTestProgress.ioTesting)
                             self._testAccessory(accessory: accessory, complete: {
                                 //Afterward, clean up
+                                NotificationCenter.default.post(name: HKTAccessoryTestProgressName, object: HKTAccessoryTestProgress.unpairing)
                                 home.removeAccessory(accessory, completionHandler: { _ in
                                     if error != nil {
                                         submitError(errorMsg: "Unpair fail")
                                     } else {
                                         self.modelAgainst.paired = false
+                                        NotificationCenter.default.post(name: HKTAccessoryTestProgressName, object: HKTAccessoryTestProgress.identify)
                                         accessory.identify(completionHandler: { (error: Error?) in
                                             if error == nil {
                                                 submitSummary(summaryMsg: "Identify Success after unpairing")
@@ -231,6 +260,7 @@ class HTKAccessoryTest: NSObject, HMAccessoryDelegate {
                                     }
                                     
                                 })
+                                NotificationCenter.default.post(name: HKTAccessoryTestProgressName, object: HKTAccessoryTestProgress.stop)
                                 self.record.save()
                             })
                         }
@@ -244,7 +274,7 @@ class HTKAccessoryTest: NSObject, HMAccessoryDelegate {
         }
         
     }
-    func _testAccessory(accessory: HMAccessory, complete:@escaping ()->Void) {
+    func _testAccessory(accessory: HMAccessory, child: Bool = false, complete:@escaping ()->Void) {
         //Setup notification
         accessory.delegate = self
         //Get a snapshot of characteristic
@@ -259,25 +289,19 @@ class HTKAccessoryTest: NSObject, HMAccessoryDelegate {
             //If bridge, ask to change configuration
             promptManualInteraction(title: "Bridge?", detail: "If this is a bridge accessory, please setup the test scenairo before pressing oksy")
             if let childUUID = accessory.uniqueIdentifiersForBridgedAccessories, childUUID.count > 0 {
+                NotificationCenter.default.post(name: HKTAccessoryTestProgressName, object: HKTAccessoryTestProgress.child)
                 //Bridged, so test child
-                let accessories = HMHomeManager().primaryHome!.accessories
+                let accessories = self.currentHome.accessories
                 for tUUID in childUUID {
                     //Get home
                     if let acc = accessories.filter({ $0.uniqueIdentifier == tUUID }).first {
                         //Test the child
-                        self._testAccessory(accessory: acc, complete: {})
+                        self._testAccessory(accessory: acc, child: true, complete: {})
                     } else {
                         submitError(errorMsg: "Accessory "+tUUID.uuidString+" missing")
                     }
                 }
             }
-            self.lastReachabilityChange = Date()
-            promptManualInteraction(title: "Turn off time", detail: "Turn off the accessories")
-            self.waitForReachability.wait()
-            submitBenchmark(objUUID: accessory.uniqueIdentifier, type: "Disconnect-RoundTrip", value: self.lastReachabilityChange.timeIntervalSinceNow * -1.0, recorder: self.record)
-            promptManualInteraction(title: "Wake up time", detail: "Turn on the accessories")
-            self.waitForReachability.wait()
-            submitBenchmark(objUUID: accessory.uniqueIdentifier, type: "Connect-RoundTrip", value: self.lastReachabilityChange.timeIntervalSinceNow * -1.0, recorder: self.record)
             complete()
         })
         for op in testOperations {
