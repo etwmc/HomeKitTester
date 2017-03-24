@@ -37,8 +37,14 @@ class ViewController: UITableViewController, HMAccessoryBrowserDelegate, HMHomeM
                 if let state = notification.object as? HKTAccessoryTestProgress {
                     switch state {
                     case .fail, .stop:
-                        self.stateStruct.setHidden(true)
-                        self.tableView.isUserInteractionEnabled = true
+                        self.stateStruct.activityIndicator.stopAnimating()
+                        UIView.animate(withDuration: 5.0, animations: {
+                        }, completion: { (complete: Bool) in
+                            if complete {
+                                self.stateStruct.setHidden(true)
+                                self.tableView.isUserInteractionEnabled = true
+                            }
+                        })
                         break
                     case .start:
                         self.stateStruct.setHidden(false)

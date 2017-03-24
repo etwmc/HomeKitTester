@@ -280,34 +280,41 @@ class HTKAccessoryTest: NSObject, HMAccessoryDelegate {
         //Get a snapshot of characteristic
         let characteristic = accessAllCharacteristic(accessory: accessory)
         //Test the first draft
-        let testOperations = characteristic.map { (char: HMCharacteristic) in
+        let testOperations: [BlockOperation]
+        testOperations = characteristic.map { (char: HMCharacteristic) in
             return BlockOperation.init(block: { testCharacteristic(characteristic: char, record: self.record) })
         }
-        testQueue.addOperations(testOperations, waitUntilFinished: false)
+        testQueue.addOperations(testOperations, waitUntilFinished: child)
         
-        let followupBlock = BlockOperation.init(block: {
+        let followupBlock = {
             //If bridge, ask to change configuration
-            promptManualInteraction(title: "Bridge?", detail: "If this is a bridge accessory, please setup the test scenairo before pressing oksy")
-            if let childUUID = accessory.uniqueIdentifiersForBridgedAccessories, childUUID.count > 0 {
-                NotificationCenter.default.post(name: HKTAccessoryTestProgressName, object: HKTAccessoryTestProgress.child)
-                //Bridged, so test child
-                let accessories = self.currentHome.accessories
-                for tUUID in childUUID {
-                    //Get home
-                    if let acc = accessories.filter({ $0.uniqueIdentifier == tUUID }).first {
-                        //Test the child
-                        self._testAccessory(accessory: acc, child: true, complete: {})
-                    } else {
-                        submitError(errorMsg: "Accessory "+tUUID.uuidString+" missing")
+            if (!child) { promptManualInteraction(title: "Bridge?", detail: "If this is a bridge accessory, please setup the test scenairo before pressing oksy")
+                if let childUUID = accessory.uniqueIdentifiersForBridgedAccessories, childUUID.count > 0 {
+                    NotificationCenter.default.post(name: HKTAccessoryTestProgressName, object: HKTAccessoryTestProgress.child)
+                    //Bridged, so test child
+                    let accessories = self.currentHome.accessories
+                    for tUUID in childUUID {
+                        //Get home
+                        if let acc = accessories.filter({ $0.uniqueIdentifier == tUUID }).first {
+                            //Test the child
+                            self._testAccessory(accessory: acc, child: true, complete: {})
+                        } else {
+                            submitError(errorMsg: "Accessory "+tUUID.uuidString+" missing")
+                        }
                     }
                 }
             }
             complete()
-        })
-        for op in testOperations {
-            followupBlock.addDependency(op)
         }
-        testQueue.addOperation(followupBlock)
+        if !child {
+            let followupBlockOP = BlockOperation.init(block: followupBlock)
+            for op in testOperations {
+                followupBlockOP.addDependency(op)
+            }
+            testQueue.addOperation(followupBlockOP)
+        } else {
+            followupBlock()
+        }
         
     }
     func accessoryDidUpdateServices(_ accessory: HMAccessory) {
